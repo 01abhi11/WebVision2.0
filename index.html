@@ -81,19 +81,19 @@
     </p>
 
     <!-- Voice SOS Button -->
-    <div class="relative flex items-center justify-center mb-8">
-      <button
-        id="mic-button"
-        onclick="toggleVoiceSOS()"
-        aria-label="Start Voice SOS"
-        class="relative z-10 w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-brand-600 hover:bg-brand-700 text-white flex flex-col items-center justify-center shadow-xl shadow-brand-600/30 transition-transform active:scale-95 cursor-pointer focus:outline-none"
-      >
-        <svg id="mic-icon" class="w-14 h-14 sm:w-16 sm:h-16 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
-        </svg>
-        <span id="mic-label" class="text-xs uppercase tracking-wider font-bold mt-2">Tap & Speak</span>
-      </button>
-    </div>
+ <div class="relative flex items-center justify-center mb-8">
+  <button
+    id="mic-button"
+    onclick="toggleVoiceSOS()"
+    aria-label="Start Voice SOS"
+    class="relative z-10 w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-brand-600 hover:bg-brand-700 text-white flex flex-col items-center justify-center shadow-xl shadow-brand-600/30 transition-transform active:scale-95 cursor-pointer focus:outline-none"
+  >
+    <svg id="mic-icon" class="w-14 h-14 sm:w-16 sm:h-16 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+    </svg>
+    <span id="mic-label" class="text-xs uppercase tracking-wider font-bold mt-2">Tap & Speak</span>
+  </button>
+</div>
 
     <!-- Status Text / Speech Box -->
     <div id="status-card" class="w-full max-w-md min-h-[4rem] bg-white border border-slate-200 rounded-2xl shadow-sm p-4 flex items-center justify-center transition-all">
