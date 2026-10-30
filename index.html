@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> BloodLink </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans antialiased selection:bg-red-200">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
+        <div class="text-2xl font-bold text-red-600 flex items-center gap-2">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            Raksha
+        </div>
+        <div class="text-sm font-medium text-gray-500">Emergency Blood Network</div>
+    </nav>
+
+    <!-- Main SOS Screen -->
+    <main id="sos-screen" class="min-h-[80vh] flex flex-col items-center justify-center px-4">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-center mb-4">Find Blood in <span class="text-red-600">60 Seconds</span></h1>
+        <p class="text-gray-500 mb-12 text-center max-w-md text-lg">Tap the microphone and speak your requirement. We handle the rest.</p>
+
+        <button onclick="startVoiceSOS()" id="mic-button" class="bg-red-600 hover:bg-red-700 text-white rounded-full w-40 h-40 flex items-center justify-center shadow-2xl transition-all duration-300 pulse-animation">
+            <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+        </button>
+
+        <div id="status-text" class="mt-8 text-xl font-medium text-gray-700 h-8"></div>
+    </main>
+
+    <!-- Donor Dashboard (Hidden by default) -->
+    <section id="dashboard-screen" class="hidden max-w-5xl mx-auto py-10 px-4">
+        <div class="flex justify-between items-end mb-6">
+            <div>
+                <h2 class="text-2xl font-bold">Matches Found</h2>
+                <p class="text-gray-600 mt-1">Requirement: <span class="font-semibold text-red-600">O-Negative</span> at <span class="font-semibold">AIIMS Delhi</span></p>
+            </div>
+            <button onclick="resetApp()" class="text-sm font-medium text-red-600 hover:underline">New Search</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Donor Card 1 -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 relative">
+                <div class="absolute top-4 right-4 bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded">Available Now</div>
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
+                        <img src="https://i.pravatar.cc/150?img=11" alt="Profile" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg">Rahul S.</h3>
+                        <p class="text-sm text-gray-500">2.4 km away (Safdarjung)</p>
+                    </div>
+                </div>
+                <!-- The Secret Sauce: Incentive Badge -->
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 flex items-center gap-2 mb-4">
+                    <span class="text-amber-500">⭐</span>
+                    <p class="text-xs font-medium text-amber-800">Lifesaver Tier: 4 Donations<br>Eligible for Apollo Pharmacy 20% off</p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-medium text-sm transition-colors">WhatsApp</button>
+                    <button class="flex-1 border border-gray-300 hover:bg-gray-50 py-2 rounded-lg font-medium text-sm transition-colors">Call</button>
+                </div>
+            </div>
+
+            <!-- Donor Card 2 -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 relative">
+                <div class="absolute top-4 right-4 bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded">Available Now</div>
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
+                        <img src="https://i.pravatar.cc/150?img=32" alt="Profile" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg">Anjali M.</h3>
+                        <p class="text-sm text-gray-500">4.1 km away (South Ex)</p>
+                    </div>
+                </div>
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 flex items-center gap-2 mb-4">
+                    <span class="text-amber-500">⭐</span>
+                    <p class="text-xs font-medium text-amber-800">Lifesaver Tier: 2 Donations<br>Eligible for Free Cafe Coffee Day</p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-medium text-sm transition-colors">WhatsApp</button>
+                    <button class="flex-1 border border-gray-300 hover:bg-gray-50 py-2 rounded-lg font-medium text-sm transition-colors">Call</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function startVoiceSOS() {
+            const micBtn = document.getElementById('mic-button');
+            const status = document.getElementById('status-text');
+
+            micBtn.classList.remove('bg-red-600');
+            micBtn.classList.add('bg-red-800', 'scale-110');
+            status.innerText = "Listening... Speak now";
+
+            // Simulating Voice Processing for Demo Reliability
+            setTimeout(() => {
+                status.innerText = `"Mujhe O-Negative blood chahiye AIIMS ke paas..."`;
+            }, 2000);
+
+            setTimeout(() => {
+                status.innerText = "Extracting data & scanning local registries...";
+            }, 4000);
+
+            setTimeout(() => {
+                document.getElementById('sos-screen').classList.add('hidden');
+                document.getElementById('dashboard-screen').classList.remove('hidden');
+                document.getElementById('dashboard-screen').classList.add('block');
+            }, 6000);
+        }
+
+        function resetApp() {
+            const micBtn = document.getElementById('mic-button');
+            const status = document.getElementById('status-text');
+
+            document.getElementById('dashboard-screen').classList.add('hidden');
+            document.getElementById('dashboard-screen').classList.remove('block');
+            document.getElementById('sos-screen').classList.remove('hidden');
+
+            micBtn.classList.add('bg-red-600');
+            micBtn.classList.remove('bg-red-800', 'scale-110');
+            status.innerText = "";
+        }
+    </script>
+</body>
+</html>
