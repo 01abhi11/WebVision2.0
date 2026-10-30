@@ -66,7 +66,7 @@
     </div>
   </header>
 
-  <!-- SOS Mic Screen -->
+  <!-- SOS Mic & Search Screen -->
   <main id="sos-screen" class="flex-1 flex flex-col items-center justify-center px-4 py-12 max-w-2xl mx-auto text-center">
     <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-50 border border-brand-100 text-brand-700 text-xs font-bold tracking-wide uppercase mb-6">
       <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
@@ -77,50 +77,50 @@
       Find Verified Donors in <span class="text-brand-600 underline decoration-brand-200 underline-offset-8">Seconds</span>
     </h1>
     <p class="text-slate-600 text-base sm:text-lg mb-10 max-w-lg">
-      Click below and speak your requirement. Say your blood group and hospital or area.
+      Click the microphone to speak, or type your blood requirement below.
     </p>
 
     <!-- Voice SOS Button -->
- <div class="relative flex items-center justify-center mb-8">
-  <button
-    id="mic-button"
-    onclick="toggleVoiceSOS()"
-    aria-label="Start Voice SOS"
-    class="relative z-10 w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-brand-600 hover:bg-brand-700 text-white flex flex-col items-center justify-center shadow-xl shadow-brand-600/30 transition-transform active:scale-95 cursor-pointer focus:outline-none"
-  >
-    <svg id="mic-icon" class="w-14 h-14 sm:w-16 sm:h-16 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
-    </svg>
-    <span id="mic-label" class="text-xs uppercase tracking-wider font-bold mt-2">Tap & Speak</span>
-  </button>
-</div>
+    <div class="relative flex items-center justify-center mb-6">
+      <button
+        id="mic-button"
+        onclick="toggleVoiceSOS()"
+        aria-label="Start Voice SOS"
+        class="relative z-10 w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-brand-600 hover:bg-brand-700 text-white flex flex-col items-center justify-center shadow-xl shadow-brand-600/30 transition-transform active:scale-95 cursor-pointer focus:outline-none"
+      >
+        <svg id="mic-icon" class="w-14 h-14 sm:w-16 sm:h-16 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+        </svg>
+        <span id="mic-label" class="text-xs uppercase tracking-wider font-bold mt-2">Tap & Speak</span>
+      </button>
+    </div>
 
-    <!-- Status Text / Speech Box -->
-    <div id="status-card" class="w-full max-w-md min-h-[4rem] bg-white border border-slate-200 rounded-2xl shadow-sm p-4 flex items-center justify-center transition-all">
+    <!-- Status Card -->
+    <div id="status-card" class="w-full max-w-md min-h-[3.5rem] bg-white border border-slate-200 rounded-2xl shadow-sm p-4 flex items-center justify-center transition-all">
       <p id="status-text" class="text-slate-500 text-sm font-medium">Try saying: <span class="italic font-semibold text-slate-700">"Urgent O-Negative needed near AIIMS"</span></p>
     </div>
 
-   <!-- Manual Text Search Bar -->
-<div class="w-full max-w-md mt-4 flex items-center gap-2">
-  <input
-    type="text"
-    id="manual-search-input"
-    placeholder="Type (e.g. O+ blood in AIIMS or Safdarjung)"
-    onkeydown="if(event.key === 'Enter') handleManualSearch()"
-    class="flex-1 px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm"
-  />
-  <button
-    onclick="handleManualSearch()"
-    class="px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl transition shadow-md shadow-brand-600/20 whitespace-nowrap"
-  >
-    Search
-  </button>
-</div>
+    <!-- Manual Search Box -->
+    <div class="w-full max-w-md mt-4 flex items-center gap-2">
+      <input
+        type="text"
+        id="manual-search-input"
+        placeholder="Type blood group & location (e.g. O+ AIIMS)"
+        onkeydown="if(event.key === 'Enter') handleManualSearch()"
+        class="flex-1 px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm"
+      />
+      <button
+        onclick="handleManualSearch()"
+        class="px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl transition shadow-md shadow-brand-600/20 whitespace-nowrap cursor-pointer"
+      >
+        Search
+      </button>
+    </div>
 
     <!-- Quick Fallback Demo Trigger -->
     <div class="mt-6 flex items-center gap-2 text-xs text-slate-400">
       <span>Microphone not working?</span>
-      <button onclick="triggerQuickDemo('O-', 'AIIMS')" class="text-brand-600 font-bold hover:underline">
+      <button onclick="triggerQuickDemo('O-', 'AIIMS')" class="text-brand-600 font-bold hover:underline cursor-pointer">
         Simulate Instant Match
       </button>
     </div>
@@ -148,8 +148,8 @@
           <option value="B+">B Positive</option>
           <option value="AB+">AB Positive</option>
         </select>
-        <button onclick="resetApp()" class="px-4 py-2 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg text-sm font-semibold transition">
-          New Voice SOS
+        <button onclick="resetApp()" class="px-4 py-2 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg text-sm font-semibold transition cursor-pointer">
+          New Search
         </button>
       </div>
     </div>
@@ -158,8 +158,9 @@
     <div id="donors-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
   </section>
 
+  <!-- Single, Clean JavaScript Block -->
   <script>
-    // 1. Supabase Initialization
+    // Supabase Connection
     const SUPABASE_URL = "https://cywufbwasulsiummfowi.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5d3VmYndhc3Vsc2l1bW1mb3dpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMzk1MzEsImV4cCI6MjEwODkxNTUzMX0.AOrSua2CBRJ6jLscRD6wnpsQGptzamK46Ti9WEPp8Do";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -168,7 +169,7 @@
     let recognition = null;
     let currentRequirement = { blood: 'O-', location: 'AIIMS' };
 
-    // 2. Web Speech API Setup
+    // Speech Recognition
     function initSpeech() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return null;
@@ -184,11 +185,9 @@
       };
 
       recog.onresult = (event) => {
-        let transcript = Array.from(event.results)
-          .map(result => result[0].transcript)
-          .join('');
-
-        document.getElementById('status-text').innerHTML = `Listening: <span class="text-slate-900 font-bold">"${transcript}"</span>`;
+        let transcript = Array.from(event.results).map(r => r[0].transcript).join('');
+        const status = document.getElementById('status-text');
+        if (status) status.innerHTML = `Listening: <span class="text-slate-900 font-bold">"${transcript}"</span>`;
 
         if (event.results[0].isFinal) {
           parseTranscriptAndSearch(transcript);
@@ -212,11 +211,7 @@
         stopListening();
         return;
       }
-
-      if (!recognition) {
-        recognition = initSpeech();
-      }
-
+      if (!recognition) recognition = initSpeech();
       if (recognition) {
         try {
           recognition.start();
@@ -230,27 +225,12 @@
     }
 
     function stopListening() {
-      const btn = document.getElementById('mic-button');
-  const label = document.getElementById('mic-label');
-  const card = document.getElementById('status-card');
-
-  if (listening) {
-    if (btn) {
-      btn.classList.add('listening-pulse', 'bg-brand-700');
-      btn.classList.remove('bg-brand-600');
+      isListening = false;
+      updateMicUI(false);
+      if (recognition) {
+        try { recognition.stop(); } catch(e) {}
+      }
     }
-    if (label) label.innerText = "Listening...";
-    if (card) card.classList.add('border-brand-500', 'ring-2', 'ring-brand-200');
-  } else {
-    if (btn) {
-      btn.classList.remove('listening-pulse', 'bg-brand-700');
-      btn.classList.add('bg-brand-600');
-    }
-    if (label) label.innerText = "Tap & Speak";
-    if (card) card.classList.remove('border-brand-500', 'ring-2', 'ring-brand-200');
-  }
-}
-
 
     function updateMicUI(listening) {
       const btn = document.getElementById('mic-button');
@@ -258,33 +238,44 @@
       const card = document.getElementById('status-card');
 
       if (listening) {
-        btn.classList.add('listening-pulse', 'bg-brand-700');
-        btn.classList.remove('bg-brand-600');
-        label.innerText = "Listening...";
-        card.classList.add('border-brand-500', 'ring-2', 'ring-brand-200');
+        if (btn) { btn.classList.add('listening-pulse', 'bg-brand-700'); btn.classList.remove('bg-brand-600'); }
+        if (label) label.innerText = "Listening...";
+        if (card) card.classList.add('border-brand-500', 'ring-2', 'ring-brand-200');
       } else {
-        btn.classList.remove('listening-pulse', 'bg-brand-700');
-        btn.classList.add('bg-brand-600');
-        label.innerText = "Tap & Speak";
-        card.classList.remove('border-brand-500', 'ring-2', 'ring-brand-200');
+        if (btn) { btn.classList.remove('listening-pulse', 'bg-brand-700'); btn.classList.add('bg-brand-600'); }
+        if (label) label.innerText = "Tap & Speak";
+        if (card) card.classList.remove('border-brand-500', 'ring-2', 'ring-brand-200');
       }
     }
 
-    // 3. Natural Language Parser
+    // Manual Search Trigger
+    function handleManualSearch() {
+      const input = document.getElementById('manual-search-input');
+      if (!input) return;
+      const val = input.value.trim();
+      if (!val) {
+        alert("Please enter a blood group or location.");
+        return;
+      }
+      parseTranscriptAndSearch(val);
+    }
+
+    // Parser for blood group and location
     function parseTranscriptAndSearch(text) {
-      document.getElementById('status-text').innerText = "Analyzing speech & querying Supabase database...";
+      const status = document.getElementById('status-text');
+      if (status) status.innerText = "Analyzing request & querying live database...";
 
       let extractedBlood = "O-";
       const normalized = text.toLowerCase();
 
-      if (normalized.includes("ab negative") || normalized.includes("ab-")) extractedBlood = "AB-";
-      else if (normalized.includes("ab positive") || normalized.includes("ab+")) extractedBlood = "AB+";
-      else if (normalized.includes("o negative") || normalized.includes("o-")) extractedBlood = "O-";
-      else if (normalized.includes("o positive") || normalized.includes("o+")) extractedBlood = "O+";
-      else if (normalized.includes("a negative") || normalized.includes("a-")) extractedBlood = "A-";
-      else if (normalized.includes("a positive") || normalized.includes("a+")) extractedBlood = "A+";
-      else if (normalized.includes("b positive") || normalized.includes("b+")) extractedBlood = "B+";
-      else if (normalized.includes("b negative") || normalized.includes("b-")) extractedBlood = "B-";
+      if (normalized.includes("ab-") || normalized.includes("ab negative")) extractedBlood = "AB-";
+      else if (normalized.includes("ab+") || normalized.includes("ab positive")) extractedBlood = "AB+";
+      else if (normalized.includes("o-") || normalized.includes("o negative")) extractedBlood = "O-";
+      else if (normalized.includes("o+") || normalized.includes("o positive")) extractedBlood = "O+";
+      else if (normalized.includes("a-") || normalized.includes("a negative")) extractedBlood = "A-";
+      else if (normalized.includes("a+") || normalized.includes("a positive")) extractedBlood = "A+";
+      else if (normalized.includes("b-") || normalized.includes("b negative")) extractedBlood = "B-";
+      else if (normalized.includes("b+") || normalized.includes("b positive")) extractedBlood = "B+";
 
       let extractedLocation = "AIIMS";
       if (normalized.includes("safdarjung")) extractedLocation = "Safdarjung";
@@ -292,16 +283,17 @@
 
       setTimeout(() => {
         showDashboard(extractedBlood, extractedLocation);
-      }, 700);
+      }, 600);
     }
 
     function triggerQuickDemo(blood, loc) {
       updateMicUI(true);
-      document.getElementById('status-text').innerHTML = `<span class="text-brand-600 font-semibold animate-pulse">Matched voice: "${blood} blood required near ${loc}"</span>`;
+      const status = document.getElementById('status-text');
+      if (status) status.innerHTML = `<span class="text-brand-600 font-semibold animate-pulse">Matched: "${blood} blood required near ${loc}"</span>`;
       setTimeout(() => {
         updateMicUI(false);
         showDashboard(blood, loc);
-      }, 1200);
+      }, 1000);
     }
 
     function showDashboard(blood, loc) {
@@ -316,7 +308,7 @@
       fetchLiveDonors();
     }
 
-    // 4. Live Query to Supabase 'donors' Table
+    // Live Query from Supabase
     async function fetchLiveDonors() {
       const selectedFilter = document.getElementById('filter-blood').value;
       const container = document.getElementById('donors-container');
@@ -341,7 +333,6 @@
           <div class="col-span-full py-8 text-center text-red-600 bg-red-50 rounded-2xl border border-red-200">
             <p class="font-bold">Error loading data from Supabase:</p>
             <p class="text-sm mt-1">${error.message}</p>
-            <p class="text-xs text-slate-500 mt-2">Make sure RLS policy is set to allow Public SELECT on the 'donors' table.</p>
           </div>
         `;
         return;
@@ -353,7 +344,7 @@
         container.innerHTML = `
           <div class="col-span-full py-12 text-center bg-white rounded-2xl border border-slate-200">
             <p class="text-slate-500 font-medium">No verified donors registered for '${selectedFilter}'.</p>
-            <button onclick="document.getElementById('filter-blood').value='ALL'; fetchLiveDonors();" class="mt-3 text-brand-600 font-bold hover:underline text-sm">View all available donors</button>
+            <button onclick="document.getElementById('filter-blood').value='ALL'; fetchLiveDonors();" class="mt-3 text-brand-600 font-bold hover:underline text-sm cursor-pointer">View all available donors</button>
           </div>
         `;
         return;
@@ -380,22 +371,20 @@
               </div>
             </div>
 
-            <!-- Lifesaver Gamified Tier -->
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-5">
               <div class="flex items-center justify-between mb-1">
                 <span class="text-xs font-bold px-2 py-0.5 rounded border ${donor.donations_count >= 5 ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-slate-200 text-slate-800 border-slate-300'}">
                   ${donor.donations_count >= 5 ? 'Gold Lifesaver' : 'Silver Lifesaver'}
                 </span>
-                <span class="text-[11px] font-bold text-slate-500">${donor.donations_count || 1} donations verified</span>
+                <span class="text-[11px] font-bold text-slate-500">${donor.donations_count || 1} donations</span>
               </div>
               <p class="text-[11px] font-medium text-slate-600 mt-1">🎁 Eligible for Partner Pharmacy & Health Perks</p>
             </div>
           </div>
 
-          <!-- Instant Contact Triggers -->
           <div class="flex gap-2">
             <a
-              href="https://wa.me/${(donor.phone || '').replace(/[^0-9]/g, '')}?text=EMERGENCY:%20Urgent%20${encodeURIComponent(donor.blood_group)}%20blood%20needed%20near%20${encodeURIComponent(currentRequirement.location)}.%20Please%20confirm%20if%20available!"
+              href="https://wa.me/${(donor.phone || '').replace(/[^0-9]/g, '')}?text=EMERGENCY:%20Urgent%20${encodeURIComponent(donor.blood_group)}%20blood%20needed%20near%20${encodeURIComponent(currentRequirement.location)}."
               target="_blank"
               class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition text-center flex items-center justify-center"
             >
@@ -415,7 +404,8 @@
     function resetApp() {
       document.getElementById('dashboard-screen').classList.add('hidden');
       document.getElementById('sos-screen').classList.remove('hidden');
-      document.getElementById('status-text').innerHTML = `Try saying: <span class="italic font-semibold text-slate-700">"Urgent O-Negative needed near AIIMS"</span>`;
+      const status = document.getElementById('status-text');
+      if (status) status.innerHTML = `Try saying: <span class="italic font-semibold text-slate-700">"Urgent O-Negative needed near AIIMS"</span>`;
     }
   </script>
 </body>
