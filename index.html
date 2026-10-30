@@ -213,12 +213,7 @@
     }
 
     function stopListening() {
-      isListening = false;
-      updateMicUI(false);
-      if (recognition) {
-        try { recognition.stop(); } catch(e) {}
-      }
-    }
+      
 
     function updateMicUI(listening) {
       const btn = document.getElementById('mic-button');
