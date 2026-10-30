@@ -5,12 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BloodLink | Voice-First Emergency Blood Donor Network</title>
 
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Supabase JS Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script>
     tailwind.config = {
       theme: {
@@ -27,8 +23,9 @@
           }
         }
       }
-    }
+    };
   </script>
+
   <style>
     @keyframes pulse-ring {
       0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
@@ -36,594 +33,536 @@
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
     }
     .listening-pulse {
-      animation: pulse-ring 1.6s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+      animation: pulse-ring 1.5s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
     }
   </style>
+
+  <!-- React 18 & Babel CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-brand-100 flex flex-col min-h-screen">
 
-  <!-- ================= AUTH GATEWAY POP-UP (ACTIVE BY DEFAULT) ================= -->
-  <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 relative">
+  <div id="root"></div>
 
-      <!-- Modal Header -->
-      <div class="text-center mb-6">
-        <div class="w-14 h-14 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm border border-brand-100">
-          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-          </svg>
-        </div>
-        <h2 class="text-2xl font-black text-slate-900">BloodLink Access</h2>
-        <p class="text-xs text-slate-500 mt-1">Verify your identity to connect to the verified emergency donor network</p>
-      </div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
 
-      <!-- Tab Switcher -->
-      <div class="flex bg-slate-100 p-1 rounded-xl mb-6 text-xs font-bold">
-        <button id="tab-phone-btn" type="button" onclick="switchAuthTab('phone')" class="flex-1 py-2.5 rounded-lg bg-white shadow-sm text-slate-900 transition cursor-pointer">Mobile OTP</button>
-        <button id="tab-id-btn" type="button" onclick="switchAuthTab('id')" class="flex-1 py-2.5 rounded-lg text-slate-500 hover:text-slate-900 transition cursor-pointer">National KYC</button>
-      </div>
-
-      <!-- Tab 1: Phone OTP -->
-      <div id="phone-auth-panel" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Mobile Number</label>
-          <div class="relative">
-            <span class="absolute left-3.5 top-3 text-sm font-semibold text-slate-400">+91</span>
-            <input
-              type="tel"
-              id="auth-phone-input"
-              maxlength="10"
-              placeholder="98765 43210"
-              class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
-            />
-          </div>
-        </div>
-
-        <div id="phone-otp-group" class="hidden">
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">6-Digit Verification Code</label>
-          <input
-            type="text"
-            id="auth-phone-otp"
-            maxlength="6"
-            placeholder="• • • • • •"
-            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium tracking-widest text-center focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
-          />
-          <p class="text-[11px] text-emerald-600 font-medium mt-1">Verification code dispatched (Demo: enter any 6 digits)</p>
-        </div>
-
-        <button
-          id="phone-submit-btn"
-          type="button"
-          onclick="handlePhoneAuthStep()"
-          class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl transition shadow-md shadow-brand-600/20 cursor-pointer"
-        >
-          Send Verification Code
-        </button>
-      </div>
-
-      <!-- Tab 2: Identity / KYC OTP -->
-      <div id="id-auth-panel" class="hidden space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">12-Digit Government ID</label>
-          <input
-            type="password"
-            id="auth-id-input"
-            maxlength="12"
-            placeholder="•••• •••• ••••"
-            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium tracking-widest text-center focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
-          />
-          <p class="text-[11px] text-slate-400 mt-1">Direct tokenized handshake to secure KYC gateway</p>
-        </div>
-
-        <div id="id-otp-group" class="hidden">
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Gateway OTP</label>
-          <input
-            type="text"
-            id="auth-id-otp"
-            maxlength="6"
-            placeholder="• • • • • •"
-            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium tracking-widest text-center focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
-          />
-        </div>
-
-        <button
-          id="id-submit-btn"
-          type="button"
-          onclick="handleIdAuthStep()"
-          class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-xl transition cursor-pointer"
-        >
-          Send Gateway OTP
-        </button>
-      </div>
-
-      <!-- Emergency Bypass -->
-      <div class="mt-5 text-center">
-        <button type="button" onclick="closeAuthModal()" class="text-xs text-slate-400 hover:text-slate-700 underline cursor-pointer">
-          Continue as Guest Bystander (Golden Hour Emergency Access)
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Header / Navbar -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-md shadow-brand-600/30">
-          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-          </svg>
-        </div>
-        <div>
-          <span class="text-xl font-black tracking-tight text-slate-900">Blood<span class="text-brand-600">Link</span></span>
-          <span class="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Supabase Connected</span>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <span id="user-status-badge" class="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-600">
-          <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-          Ready
-        </span>
-        <button
-          id="nav-login-btn"
-          onclick="openAuthModal()"
-          class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer"
-        >
-          Login / Verify
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- SOS Mic & Search Screen -->
-  <main id="sos-screen" class="flex-1 flex flex-col items-center justify-center px-4 py-12 max-w-2xl mx-auto text-center">
-    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-50 border border-brand-100 text-brand-700 text-xs font-bold tracking-wide uppercase mb-6">
-      <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-      Golden Hour Response Protocol
-    </div>
-
-    <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-slate-900 mb-4 leading-tight">
-      Find Verified Donors in <span class="text-brand-600 underline decoration-brand-200 underline-offset-8">Seconds</span>
-    </h1>
-    <p class="text-slate-600 text-base sm:text-lg mb-10 max-w-lg">
-      Click the microphone to speak, or type your blood requirement below.
-    </p>
-
-    <!-- Voice SOS Button -->
-    <div class="relative flex items-center justify-center mb-6">
-      <button
-        id="mic-button"
-        onclick="toggleVoiceSOS()"
-        aria-label="Start Voice SOS"
-        class="relative z-10 w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-brand-600 hover:bg-brand-700 text-white flex flex-col items-center justify-center shadow-xl shadow-brand-600/30 transition-transform active:scale-95 cursor-pointer focus:outline-none"
-      >
-        <svg id="mic-icon" class="w-14 h-14 sm:w-16 sm:h-16 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
-        </svg>
-        <span id="mic-label" class="text-xs uppercase tracking-wider font-bold mt-2">Tap & Speak</span>
-      </button>
-    </div>
-
-    <!-- Status Card -->
-    <div id="status-card" class="w-full max-w-md min-h-[3.5rem] bg-white border border-slate-200 rounded-2xl shadow-sm p-4 flex items-center justify-center transition-all">
-      <p id="status-text" class="text-slate-500 text-sm font-medium">Try saying: <span class="italic font-semibold text-slate-700">"Urgent O-Negative needed near AIIMS"</span></p>
-    </div>
-
-    <!-- Manual Search Box -->
-    <div class="w-full max-w-md mt-4 flex items-center gap-2">
-      <input
-        type="text"
-        id="manual-search-input"
-        placeholder="Type blood group & location (e.g. O+ AIIMS)"
-        onkeydown="if(event.key === 'Enter') handleManualSearch()"
-        class="flex-1 px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm"
-      />
-      <button
-        onclick="handleManualSearch()"
-        class="px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl transition shadow-md shadow-brand-600/20 whitespace-nowrap cursor-pointer"
-      >
-        Search
-      </button>
-    </div>
-
-    <!-- Quick Fallback Demo Trigger -->
-    <div class="mt-6 flex items-center gap-2 text-xs text-slate-400">
-      <span>Microphone not working?</span>
-      <button onclick="triggerQuickDemo('O-', 'AIIMS')" class="text-brand-600 font-bold hover:underline cursor-pointer">
-        Simulate Instant Match
-      </button>
-    </div>
-  </main>
-
-  <!-- Donor Dashboard (Shown after search) -->
-  <section id="dashboard-screen" class="hidden flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-    <div class="bg-white border border-slate-200 rounded-2xl p-5 mb-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <div>
-        <div class="flex items-center gap-2 mb-1">
-          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-brand-100 text-brand-700">Critical Priority</span>
-          <span id="match-count" class="text-xs text-slate-500 font-semibold">Checking live records...</span>
-        </div>
-        <h2 class="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2">
-          Request: <span id="dash-blood-group" class="text-brand-600">O-</span> near <span id="dash-location" class="text-slate-800">AIIMS</span>
-        </h2>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <select id="filter-blood" onchange="fetchLiveDonors()" class="bg-slate-50 border border-slate-300 rounded-lg text-sm font-medium px-3 py-2 text-slate-700">
-          <option value="ALL">All Groups</option>
-          <option value="O-">O Negative</option>
-          <option value="O+">O Positive</option>
-          <option value="A+">A Positive</option>
-          <option value="B+">B Positive</option>
-          <option value="AB+">AB Positive</option>
-        </select>
-        <button onclick="resetApp()" class="px-4 py-2 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg text-sm font-semibold transition cursor-pointer">
-          New Search
-        </button>
-      </div>
-    </div>
-
-    <!-- Live Donors Grid -->
-    <div id="donors-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-  </section>
-
-  <!-- Main JavaScript Block -->
-  <script>
-    // Supabase Connection
+    // Supabase Configuration
     const SUPABASE_URL = "https://cywufbwasulsiummfowi.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5d3VmYndhc3Vsc2l1bW1mb3dpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMzk1MzEsImV4cCI6MjEwODkxNTUzMX0.AOrSua2CBRJ6jLscRD6wnpsQGptzamK46Ti9WEPp8Do";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let isListening = false;
-    let recognition = null;
-    let currentRequirement = { blood: 'O-', location: 'AIIMS' };
+    // Initial Offline Fallback Data
+    const FALLBACK_DONORS = [
+      { id: 1, name: "Rahul Sharma", blood_group: "O-", phone: "+919876543210", area_name: "Safdarjung Enclave", distance_km: 1.8, donations_count: 6 },
+      { id: 2, name: "Anjali Mathur", blood_group: "O-", phone: "+919876543211", area_name: "South Extension", distance_km: 3.2, donations_count: 3 },
+      { id: 3, name: "Vikram Seth", blood_group: "B+", phone: "+919876543212", area_name: "Green Park", distance_km: 4.5, donations_count: 12 },
+      { id: 4, name: "Pooja Hegde", blood_group: "A+", phone: "+919876543213", area_name: "Hauz Khas", distance_km: 2.1, donations_count: 2 }
+    ];
 
-    // Verification State
-    let activeAuthTab = 'phone';
-    let phoneOtpSent = false;
-    let idOtpSent = false;
-    let isUserVerified = false;
+    function App() {
+      // Navigation & Modal State
+      const [showAuthModal, setShowAuthModal] = useState(true);
+      const [authTab, setAuthTab] = useState('phone'); // 'phone' | 'id'
+      const [userVerified, setUserVerified] = useState(false);
+      const [verificationTag, setVerificationTag] = useState("Guest");
 
-    // Modal Control Functions
-    function openAuthModal() {
-      document.getElementById('auth-modal').classList.remove('hidden');
-    }
+      // Verification Form State
+      const [phone, setPhone] = useState("");
+      const [phoneOtp, setPhoneOtp] = useState("");
+      const [phoneOtpSent, setPhoneOtpSent] = useState(false);
 
-    function closeAuthModal() {
-      document.getElementById('auth-modal').classList.add('hidden');
-    }
+      const [idNumber, setIdNumber] = useState("");
+      const [idOtp, setIdOtp] = useState("");
+      const [idOtpSent, setIdOtpSent] = useState(false);
 
-    function switchAuthTab(tab) {
-      activeAuthTab = tab;
-      const phonePanel = document.getElementById('phone-auth-panel');
-      const idPanel = document.getElementById('id-auth-panel');
-      const phoneTabBtn = document.getElementById('tab-phone-btn');
-      const idTabBtn = document.getElementById('tab-id-btn');
+      // Search & Screen State
+      const [currentScreen, setCurrentScreen] = useState('sos'); // 'sos' | 'dashboard'
+      const [statusText, setStatusText] = useState('Try saying: "Urgent O-Negative needed near AIIMS"');
+      const [isListening, setIsListening] = useState(false);
+      const [textQuery, setTextQuery] = useState("");
+      const [selectedBlood, setSelectedBlood] = useState("O-");
+      const [selectedLocation, setSelectedLocation] = useState("AIIMS");
 
-      if (tab === 'phone') {
-        phonePanel.classList.remove('hidden');
-        idPanel.classList.add('hidden');
-        phoneTabBtn.className = "flex-1 py-2.5 rounded-lg bg-white shadow-sm text-slate-900 transition cursor-pointer";
-        idTabBtn.className = "flex-1 py-2.5 rounded-lg text-slate-500 hover:text-slate-900 transition cursor-pointer";
-      } else {
-        phonePanel.classList.add('hidden');
-        idPanel.classList.remove('hidden');
-        idTabBtn.className = "flex-1 py-2.5 rounded-lg bg-white shadow-sm text-slate-900 transition cursor-pointer";
-        phoneTabBtn.className = "flex-1 py-2.5 rounded-lg text-slate-500 hover:text-slate-900 transition cursor-pointer";
-      }
-    }
+      // Donors Data State
+      const [donors, setDonors] = useState([]);
+      const [filterGroup, setFilterGroup] = useState("O-");
+      const [isLoadingDonors, setIsLoadingDonors] = useState(false);
 
-    // Phone OTP Flow
-    function handlePhoneAuthStep() {
-      const phoneInput = document.getElementById('auth-phone-input');
-      const otpInput = document.getElementById('auth-phone-otp');
-      const otpGroup = document.getElementById('phone-otp-group');
-      const btn = document.getElementById('phone-submit-btn');
+      const recognitionRef = useRef(null);
 
-      if (!phoneOtpSent) {
-        if (!phoneInput.value || phoneInput.value.length < 10) {
-          alert("Please enter a valid 10-digit mobile number.");
-          return;
-        }
-        btn.innerText = "Sending Code...";
-        setTimeout(() => {
-          phoneOtpSent = true;
-          otpGroup.classList.remove('hidden');
-          btn.innerText = "Confirm & Proceed";
-        }, 500);
-      } else {
-        if (otpInput.value.trim().length !== 6) {
-          alert("Please enter the 6-digit OTP code.");
-          return;
-        }
-        completeVerification("Mobile Verified (+91 ••••" + phoneInput.value.slice(-4) + ")");
-      }
-    }
-
-    // Identity / KYC Flow
-    function handleIdAuthStep() {
-      const idInput = document.getElementById('auth-id-input');
-      const otpInput = document.getElementById('auth-id-otp');
-      const otpGroup = document.getElementById('id-otp-group');
-      const btn = document.getElementById('id-submit-btn');
-
-      if (!idOtpSent) {
-        if (!idInput.value || idInput.value.length !== 12) {
-          alert("Please enter a valid 12-digit ID number.");
-          return;
-        }
-        btn.innerText = "Requesting Gateway OTP...";
-        setTimeout(() => {
-          idOtpSent = true;
-          otpGroup.classList.remove('hidden');
-          btn.innerText = "Verify ID & Proceed";
-        }, 600);
-      } else {
-        if (otpInput.value.trim().length !== 6) {
-          alert("Please enter the 6-digit verification code.");
-          return;
-        }
-        completeVerification("Verified ID Protocol");
-      }
-    }
-
-    function completeVerification(badgeText) {
-      isUserVerified = true;
-      closeAuthModal();
-
-      const badge = document.getElementById('user-status-badge');
-      if (badge) {
-        badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-500"></span> ${badgeText}`;
-        badge.classList.remove('hidden');
-      }
-
-      const loginBtn = document.getElementById('nav-login-btn');
-      if (loginBtn) {
-        loginBtn.innerText = "Verified Active";
-        loginBtn.className = "px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-300 rounded-xl text-xs font-bold transition shadow-sm cursor-default";
-        loginBtn.onclick = null;
-      }
-    }
-
-    // Web Speech API
-    function initSpeech() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) return null;
-
-      const recog = new SpeechRecognition();
-      recog.continuous = false;
-      recog.interimResults = true;
-      recog.lang = 'en-US';
-
-      recog.onstart = () => {
-        isListening = true;
-        updateMicUI(true);
-      };
-
-      recog.onresult = (event) => {
-        let transcript = Array.from(event.results).map(r => r[0].transcript).join('');
-        const status = document.getElementById('status-text');
-        if (status) status.innerHTML = `Listening: <span class="text-slate-900 font-bold">"${transcript}"</span>`;
-
-        if (event.results[0].isFinal) {
-          parseTranscriptAndSearch(transcript);
+      // Handle Phone OTP
+      const handlePhoneSubmit = (e) => {
+        e.preventDefault();
+        if (!phoneOtpSent) {
+          if (phone.length < 10) return alert("Please enter a valid 10-digit mobile number.");
+          setPhoneOtpSent(true);
+        } else {
+          if (phoneOtp.length !== 6) return alert("Please enter the 6-digit OTP.");
+          setUserVerified(true);
+          setVerificationTag(`Verified (+91 ••${phone.slice(-4)})`);
+          setShowAuthModal(false);
         }
       };
 
-      recog.onerror = () => {
-        stopListening();
-        triggerQuickDemo("O-", "AIIMS");
+      // Handle ID KYC
+      const handleIdSubmit = (e) => {
+        e.preventDefault();
+        if (!idOtpSent) {
+          if (idNumber.length !== 12) return alert("Please enter a valid 12-digit ID.");
+          setIdOtpSent(true);
+        } else {
+          if (idOtp.length !== 6) return alert("Please enter the 6-digit verification code.");
+          setUserVerified(true);
+          setVerificationTag("Verified ID");
+          setShowAuthModal(false);
+        }
       };
 
-      recog.onend = () => {
-        stopListening();
-      };
-
-      return recog;
-    }
-
-    function toggleVoiceSOS() {
-      if (isListening) {
-        stopListening();
-        return;
-      }
-      if (!recognition) recognition = initSpeech();
-      if (recognition) {
+      // Query Live Supabase Donors
+      const loadDonors = async (bloodGroup) => {
+        setIsLoadingDonors(true);
         try {
-          recognition.start();
-        } catch (e) {
-          recognition.stop();
-          triggerQuickDemo("O-", "AIIMS");
+          let query = supabase.from('donors').select('*');
+          if (bloodGroup && bloodGroup !== 'ALL') {
+            query = query.eq('blood_group', bloodGroup);
+          }
+          const { data, error } = await query;
+          if (error || !data || data.length === 0) {
+            const filteredFallback = (bloodGroup === 'ALL' || !bloodGroup)
+              ? FALLBACK_DONORS
+              : FALLBACK_DONORS.filter(d => d.blood_group === bloodGroup);
+            setDonors(filteredFallback);
+          } else {
+            setDonors(data);
+          }
+        } catch (err) {
+          setDonors(FALLBACK_DONORS);
+        } finally {
+          setIsLoadingDonors(false);
         }
-      } else {
-        triggerQuickDemo("O-", "AIIMS");
-      }
-    }
+      };
 
-    function stopListening() {
-      isListening = false;
-      updateMicUI(false);
-      if (recognition) {
-        try { recognition.stop(); } catch(e) {}
-      }
-    }
+      // Speech Recognition & Natural Language Parsing
+      const parseAndTriggerSearch = (transcript) => {
+        let detectedBlood = "O-";
+        const norm = transcript.toLowerCase();
 
-    function updateMicUI(listening) {
-      const btn = document.getElementById('mic-button');
-      const label = document.getElementById('mic-label');
-      const card = document.getElementById('status-card');
+        if (norm.includes("ab-") || norm.includes("ab negative")) detectedBlood = "AB-";
+        else if (norm.includes("ab+") || norm.includes("ab positive")) detectedBlood = "AB+";
+        else if (norm.includes("o-") || norm.includes("o negative")) detectedBlood = "O-";
+        else if (norm.includes("o+") || norm.includes("o positive")) detectedBlood = "O+";
+        else if (norm.includes("a-") || norm.includes("a negative")) detectedBlood = "A-";
+        else if (norm.includes("a+") || norm.includes("a positive")) detectedBlood = "A+";
+        else if (norm.includes("b-") || norm.includes("b negative")) detectedBlood = "B-";
+        else if (norm.includes("b+") || norm.includes("b positive")) detectedBlood = "B+";
 
-      if (listening) {
-        if (btn) { btn.classList.add('listening-pulse', 'bg-brand-700'); btn.classList.remove('bg-brand-600'); }
-        if (label) label.innerText = "Listening...";
-        if (card) card.classList.add('border-brand-500', 'ring-2', 'ring-brand-200');
-      } else {
-        if (btn) { btn.classList.remove('listening-pulse', 'bg-brand-700'); btn.classList.add('bg-brand-600'); }
-        if (label) label.innerText = "Tap & Speak";
-        if (card) card.classList.remove('border-brand-500', 'ring-2', 'ring-brand-200');
-      }
-    }
+        let detectedLoc = "AIIMS";
+        if (norm.includes("safdarjung")) detectedLoc = "Safdarjung";
+        else if (norm.includes("south ex")) detectedLoc = "South Extension";
 
-    // Manual Search Trigger
-    function handleManualSearch() {
-      const input = document.getElementById('manual-search-input');
-      if (!input) return;
-      const val = input.value.trim();
-      if (!val) {
-        alert("Please enter a blood group or location.");
-        return;
-      }
-      parseTranscriptAndSearch(val);
-    }
+        setSelectedBlood(detectedBlood);
+        setSelectedLocation(detectedLoc);
+        setFilterGroup(detectedBlood);
 
-    // Natural Language Extractor
-    function parseTranscriptAndSearch(text) {
-      const status = document.getElementById('status-text');
-      if (status) status.innerText = "Analyzing request & querying live database...";
+        setCurrentScreen('dashboard');
+        loadDonors(detectedBlood);
+      };
 
-      let extractedBlood = "O-";
-      const normalized = text.toLowerCase();
+      const toggleVoiceSOS = () => {
+        if (isListening) {
+          if (recognitionRef.current) recognitionRef.current.stop();
+          setIsListening(false);
+          return;
+        }
 
-      if (normalized.includes("ab-") || normalized.includes("ab negative")) extractedBlood = "AB-";
-      else if (normalized.includes("ab+") || normalized.includes("ab positive")) extractedBlood = "AB+";
-      else if (normalized.includes("o-") || normalized.includes("o negative")) extractedBlood = "O-";
-      else if (normalized.includes("o+") || normalized.includes("o positive")) extractedBlood = "O+";
-      else if (normalized.includes("a-") || normalized.includes("a negative")) extractedBlood = "A-";
-      else if (normalized.includes("a+") || normalized.includes("a positive")) extractedBlood = "A+";
-      else if (normalized.includes("b-") || normalized.includes("b negative")) extractedBlood = "B-";
-      else if (normalized.includes("b+") || normalized.includes("b positive")) extractedBlood = "B+";
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRec) {
+          runSimulation("O-", "AIIMS");
+          return;
+        }
 
-      let extractedLocation = "AIIMS";
-      if (normalized.includes("safdarjung")) extractedLocation = "Safdarjung";
-      else if (normalized.includes("south ex")) extractedLocation = "South Extension";
+        try {
+          const recog = new SpeechRec();
+          recog.lang = 'en-US';
+          recog.interimResults = true;
 
-      setTimeout(() => {
-        showDashboard(extractedBlood, extractedLocation);
-      }, 600);
-    }
+          recog.onstart = () => setIsListening(true);
+          recog.onresult = (e) => {
+            const text = Array.from(e.results).map(r => r[0].transcript).join('');
+            setStatusText(`Listening: "${text}"`);
+            if (e.results[0].isFinal) {
+              recog.stop();
+              setIsListening(false);
+              parseAndTriggerSearch(text);
+            }
+          };
+          recog.onerror = () => {
+            setIsListening(false);
+            runSimulation("O-", "AIIMS");
+          };
+          recog.onend = () => setIsListening(false);
 
-    function triggerQuickDemo(blood, loc) {
-      updateMicUI(true);
-      const status = document.getElementById('status-text');
-      if (status) status.innerHTML = `<span class="text-brand-600 font-semibold animate-pulse">Matched: "${blood} blood required near ${loc}"</span>`;
-      setTimeout(() => {
-        updateMicUI(false);
-        showDashboard(blood, loc);
-      }, 1000);
-    }
+          recognitionRef.current = recog;
+          recog.start();
+        } catch (e) {
+          runSimulation("O-", "AIIMS");
+        }
+      };
 
-    function showDashboard(blood, loc) {
-      currentRequirement = { blood, location: loc };
-      document.getElementById('dash-blood-group').innerText = blood;
-      document.getElementById('dash-location').innerText = loc;
-      document.getElementById('filter-blood').value = blood;
+      const runSimulation = (bGroup, loc) => {
+        setIsListening(true);
+        setStatusText(`Matched Voice SOS: "${bGroup} blood needed near ${loc}"`);
+        setTimeout(() => {
+          setIsListening(false);
+          parseAndTriggerSearch(`${bGroup} blood needed near ${loc}`);
+        }, 900);
+      };
 
-      document.getElementById('sos-screen').classList.add('hidden');
-      document.getElementById('dashboard-screen').classList.remove('hidden');
+      const handleManualSearch = (e) => {
+        if (e) e.preventDefault();
+        if (!textQuery.trim()) return alert("Please type your requirement (e.g. O+ AIIMS)");
+        parseAndTriggerSearch(textQuery);
+      };
 
-      fetchLiveDonors();
-    }
+      const handleFilterChange = (val) => {
+        setFilterGroup(val);
+        loadDonors(val);
+      };
 
-    // Live Query from Supabase
-    async function fetchLiveDonors() {
-      const selectedFilter = document.getElementById('filter-blood').value;
-      const container = document.getElementById('donors-container');
-
-      container.innerHTML = `
-        <div class="col-span-full py-16 text-center text-slate-500 font-semibold">
-          <div class="inline-block animate-spin w-8 h-8 border-4 border-brand-600 border-t-transparent rounded-full mb-3"></div>
-          <p>Querying live database...</p>
-        </div>
-      `;
-
-      let query = supabase.from('donors').select('*');
-      if (selectedFilter !== 'ALL') {
-        query = query.eq('blood_group', selectedFilter);
-      }
-
-      const { data: donors, error } = await query;
-
-      if (error) {
-        console.error("Supabase Error:", error);
-        container.innerHTML = `
-          <div class="col-span-full py-8 text-center text-red-600 bg-red-50 rounded-2xl border border-red-200">
-            <p class="font-bold">Error loading data from Supabase:</p>
-            <p class="text-sm mt-1">${error.message}</p>
-          </div>
-        `;
-        return;
-      }
-
-      document.getElementById('match-count').innerText = `${donors.length} Verified Donors Available`;
-
-      if (donors.length === 0) {
-        container.innerHTML = `
-          <div class="col-span-full py-12 text-center bg-white rounded-2xl border border-slate-200">
-            <p class="text-slate-500 font-medium">No verified donors registered for '${selectedFilter}'.</p>
-            <button onclick="document.getElementById('filter-blood').value='ALL'; fetchLiveDonors();" class="mt-3 text-brand-600 font-bold hover:underline text-sm cursor-pointer">View all available donors</button>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = donors.map(donor => `
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition-shadow relative flex flex-col justify-between">
-          <div class="absolute top-4 right-4">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-black bg-brand-50 text-brand-700 border border-brand-200">
-              ${donor.blood_group}
-            </span>
-          </div>
-
-          <div>
-            <div class="flex items-center gap-3.5 mb-4">
-              <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-700 border border-slate-200 text-lg">
-                ${donor.name ? donor.name.charAt(0).toUpperCase() : 'D'}
+      return (
+        <div className="flex flex-col min-h-screen">
+          {/* Header */}
+          <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+              <div className="flex items-center gap-3 cursor-pointer" onClick={() => setCurrentScreen('sos')}>
+                <div className="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-md shadow-brand-600/30">
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-xl font-black tracking-tight text-slate-900">Blood<span className="text-brand-600">Link</span></span>
+                  <span className="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Supabase Connected</span>
+                </div>
               </div>
-              <div>
-                <h3 class="font-bold text-slate-900 leading-snug">${donor.name}</h3>
-                <p class="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                  ${donor.distance_km || '2.0'} km away • ${donor.area_name || 'Delhi NCR'}
-                </p>
-              </div>
-            </div>
 
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-5">
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-xs font-bold px-2 py-0.5 rounded border ${donor.donations_count >= 5 ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-slate-200 text-slate-800 border-slate-300'}">
-                  ${donor.donations_count >= 5 ? 'Gold Lifesaver' : 'Silver Lifesaver'}
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+                  {verificationTag}
                 </span>
-                <span class="text-[11px] font-bold text-slate-500">${donor.donations_count || 1} donations</span>
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer"
+                >
+                  {userVerified ? "Profile Settings" : "Login / Verify"}
+                </button>
               </div>
-              <p class="text-[11px] font-medium text-slate-600 mt-1">🎁 Eligible for Partner Pharmacy & Health Perks</p>
             </div>
-          </div>
+          </header>
 
-          <div class="flex gap-2">
-            <a
-              href="https://wa.me/${(donor.phone || '').replace(/[^0-9]/g, '')}?text=EMERGENCY:%20Urgent%20${encodeURIComponent(donor.blood_group)}%20blood%20needed%20near%20${encodeURIComponent(currentRequirement.location)}."
-              target="_blank"
-              class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition text-center flex items-center justify-center"
-            >
-              WhatsApp
-            </a>
-            <a
-              href="tel:${donor.phone || ''}"
-              class="flex-1 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2.5 rounded-xl transition text-center flex items-center justify-center"
-            >
-              Call Direct
-            </a>
-          </div>
+          {/* Verification Pop-Up Modal */}
+          {showAuthModal && (
+            <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 relative">
+                <div className="text-center mb-6">
+                  <div className="w-14 h-14 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm border border-brand-100">
+                    <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                  </div>
+                  <h2 className="text-2xl font-black text-slate-900">BloodLink Access</h2>
+                  <p className="text-xs text-slate-500 mt-1">Verify identity to access real-time emergency donor dispatch</p>
+                </div>
+
+                <div className="flex bg-slate-100 p-1 rounded-xl mb-6 text-xs font-bold">
+                  <button
+                    onClick={() => setAuthTab('phone')}
+                    className={`flex-1 py-2.5 rounded-lg transition cursor-pointer ${authTab === 'phone' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}
+                  >
+                    Mobile OTP
+                  </button>
+                  <button
+                    onClick={() => setAuthTab('id')}
+                    className={`flex-1 py-2.5 rounded-lg transition cursor-pointer ${authTab === 'id' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}
+                  >
+                    National KYC
+                  </button>
+                </div>
+
+                {authTab === 'phone' ? (
+                  <form onSubmit={handlePhoneSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Mobile Number</label>
+                      <div className="relative">
+                        <span className="absolute left-3.5 top-3 text-sm font-semibold text-slate-400">+91</span>
+                        <input
+                          type="tel"
+                          maxLength="10"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                          placeholder="98765 43210"
+                          className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        />
+                      </div>
+                    </div>
+
+                    {phoneOtpSent && (
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">6-Digit OTP</label>
+                        <input
+                          type="text"
+                          maxLength="6"
+                          value={phoneOtp}
+                          onChange={(e) => setPhoneOtp(e.target.value.replace(/\D/g, ''))}
+                          placeholder="• • • • • •"
+                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium tracking-widest text-center focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        />
+                        <p className="text-[11px] text-emerald-600 font-medium mt-1">SMS code sent (Enter any 6 digits for demo)</p>
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      className="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl transition shadow-md shadow-brand-600/20 cursor-pointer"
+                    >
+                      {phoneOtpSent ? "Confirm & Enter" : "Send Verification Code"}
+                    </button>
+                  </form>
+                ) : (
+                  <form onSubmit={handleIdSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">National ID Number</label>
+                      <input
+                        type="password"
+                        maxLength="12"
+                        value={idNumber}
+                        onChange={(e) => setIdNumber(e.target.value.replace(/\D/g, ''))}
+                        placeholder="•••• •••• ••••"
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium tracking-widest text-center focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      />
+                      <p className="text-[11px] text-slate-400 mt-1">Encrypted direct transmission to UIDAI / DigiLocker gateway</p>
+                    </div>
+
+                    {idOtpSent && (
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Gateway OTP</label>
+                        <input
+                          type="text"
+                          maxLength="6"
+                          value={idOtp}
+                          onChange={(e) => setIdOtp(e.target.value.replace(/\D/g, ''))}
+                          placeholder="• • • • • •"
+                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium tracking-widest text-center focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        />
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-xl transition cursor-pointer"
+                    >
+                      {idOtpSent ? "Verify & Authorize" : "Send Gateway OTP"}
+                    </button>
+                  </form>
+                )}
+
+                <div className="mt-5 text-center">
+                  <button
+                    onClick={() => setShowAuthModal(false)}
+                    className="text-xs text-slate-400 hover:text-slate-700 underline cursor-pointer"
+                  >
+                    Continue as Guest (Golden Hour Emergency Bystander)
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Screen 1: Voice SOS & Manual Search Screen */}
+          {currentScreen === 'sos' && (
+            <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 max-w-2xl mx-auto text-center">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-50 border border-brand-100 text-brand-700 text-xs font-bold tracking-wide uppercase mb-6">
+                <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                Golden Hour Response Protocol
+              </div>
+
+              <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-slate-900 mb-4 leading-tight">
+                Find Verified Donors in <span className="text-brand-600 underline decoration-brand-200 underline-offset-8">Seconds</span>
+              </h1>
+              <p className="text-slate-600 text-base sm:text-lg mb-10 max-w-lg">
+                Click the microphone to speak, or type your blood requirement below.
+              </p>
+
+              {/* Pulsing SOS Button */}
+              <div className="relative flex items-center justify-center mb-6">
+                <button
+                  onClick={toggleVoiceSOS}
+                  className={`relative z-10 w-36 h-36 sm:w-44 sm:h-44 rounded-full text-white flex flex-col items-center justify-center shadow-xl shadow-brand-600/30 transition-transform active:scale-95 cursor-pointer focus:outline-none ${isListening ? 'bg-brand-700 listening-pulse' : 'bg-brand-600 hover:bg-brand-700'}`}
+                >
+                  <svg className="w-14 h-14 sm:w-16 sm:h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                  </svg>
+                  <span className="text-xs uppercase tracking-wider font-bold mt-2">
+                    {isListening ? "Listening..." : "Tap & Speak"}
+                  </span>
+                </button>
+              </div>
+
+              {/* Status Box */}
+              <div className={`w-full max-w-md min-h-[3.5rem] bg-white border rounded-2xl shadow-sm p-4 flex items-center justify-center transition-all ${isListening ? 'border-brand-500 ring-2 ring-brand-200' : 'border-slate-200'}`}>
+                <p className="text-slate-600 text-sm font-medium">{statusText}</p>
+              </div>
+
+              {/* Manual Input Search */}
+              <form onSubmit={handleManualSearch} className="w-full max-w-md mt-4 flex items-center gap-2">
+                <input
+                  type="text"
+                  value={textQuery}
+                  onChange={(e) => setTextQuery(e.target.value)}
+                  placeholder="Type (e.g. O+ blood in AIIMS)"
+                  className="flex-1 px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm"
+                />
+                <button
+                  type="submit"
+                  className="px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl transition shadow-md shadow-brand-600/20 whitespace-nowrap cursor-pointer"
+                >
+                  Search
+                </button>
+              </form>
+
+              <div className="mt-6 flex items-center gap-2 text-xs text-slate-400">
+                <span>Microphone unavailable?</span>
+                <button onClick={() => runSimulation("O-", "AIIMS")} className="text-brand-600 font-bold hover:underline cursor-pointer">
+                  Simulate Instant Match
+                </button>
+              </div>
+            </main>
+          )}
+
+          {/* Screen 2: Real-time Matching Dashboard */}
+          {currentScreen === 'dashboard' && (
+            <section className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+              <div className="bg-white border border-slate-200 rounded-2xl p-5 mb-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-brand-100 text-brand-700">Critical Priority</span>
+                    <span className="text-xs text-slate-500 font-semibold">{donors.length} Donors Verified in Database</span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                    Request: <span className="text-brand-600">{selectedBlood}</span> near <span className="text-slate-800">{selectedLocation}</span>
+                  </h2>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <select
+                    value={filterGroup}
+                    onChange={(e) => handleFilterChange(e.target.value)}
+                    className="bg-slate-50 border border-slate-300 rounded-lg text-sm font-medium px-3 py-2 text-slate-700 focus:outline-none"
+                  >
+                    <option value="ALL">All Groups</option>
+                    <option value="O-">O Negative</option>
+                    <option value="O+">O Positive</option>
+                    <option value="A+">A Positive</option>
+                    <option value="B+">B Positive</option>
+                    <option value="AB+">AB Positive</option>
+                  </select>
+                  <button
+                    onClick={() => setCurrentScreen('sos')}
+                    className="px-4 py-2 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg text-sm font-semibold transition cursor-pointer"
+                  >
+                    New Search
+                  </button>
+                </div>
+              </div>
+
+              {/* Donors Grid */}
+              {isLoadingDonors ? (
+                <div className="py-20 text-center">
+                  <div className="inline-block animate-spin w-10 h-10 border-4 border-brand-600 border-t-transparent rounded-full mb-3"></div>
+                  <p className="text-slate-500 font-medium text-sm">Querying live donor registry...</p>
+                </div>
+              ) : donors.length === 0 ? (
+                <div className="py-16 text-center bg-white rounded-2xl border border-slate-200">
+                  <p className="text-slate-500 font-medium">No verified donors registered for '{filterGroup}'.</p>
+                  <button
+                    onClick={() => handleFilterChange('ALL')}
+                    className="mt-3 text-brand-600 font-bold hover:underline text-sm cursor-pointer"
+                  >
+                    View all donors
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {donors.map((donor) => (
+                    <div key={donor.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition-shadow relative flex flex-col justify-between">
+                      <div className="absolute top-4 right-4">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-black bg-brand-50 text-brand-700 border border-brand-200">
+                          {donor.blood_group}
+                        </span>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center gap-3.5 mb-4">
+                          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-700 border border-slate-200 text-lg">
+                            {donor.name ? donor.name.charAt(0).toUpperCase() : 'D'}
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-slate-900 leading-snug">{donor.name}</h3>
+                            <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                              {donor.distance_km || '2.0'} km away • {donor.area_name || 'Delhi NCR'}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Lifesaver Tier Badge */}
+                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-5">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded border ${(donor.donations_count || 1) >= 5 ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-slate-200 text-slate-800 border-slate-300'}`}>
+                              {(donor.donations_count || 1) >= 5 ? 'Gold Lifesaver' : 'Silver Lifesaver'}
+                            </span>
+                            <span className="text-[11px] font-bold text-slate-500">{donor.donations_count || 1} donations verified</span>
+                          </div>
+                          <p className="text-[11px] font-medium text-slate-600 mt-1">🎁 Eligible for Partner Pharmacy & Health Checkup Perks</p>
+                        </div>
+                      </div>
+
+                      {/* Direct Triggers */}
+                      <div className="flex gap-2">
+                        <a
+                          href={`https://wa.me/${(donor.phone || '').replace(/\D/g, '')}?text=EMERGENCY:%20Urgent%20${encodeURIComponent(donor.blood_group)}%20blood%20needed%20near%20${encodeURIComponent(selectedLocation)}.`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition text-center flex items-center justify-center"
+                        >
+                          WhatsApp
+                        </a>
+                        <a
+                          href={`tel:${donor.phone || ''}`}
+                          className="flex-1 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2.5 rounded-xl transition text-center flex items-center justify-center"
+                        >
+                          Direct Call
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
         </div>
-      `).join('');
+      );
     }
 
-    function resetApp() {
-      document.getElementById('dashboard-screen').classList.add('hidden');
-      document.getElementById('sos-screen').classList.remove('hidden');
-      const status = document.getElementById('status-text');
-      if (status) status.innerHTML = `Try saying: <span class="italic font-semibold text-slate-700">"Urgent O-Negative needed near AIIMS"</span>`;
-    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   </script>
 </body>
 </html>
