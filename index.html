@@ -213,7 +213,27 @@
     }
 
     function stopListening() {
-      
+      const btn = document.getElementById('mic-button');
+  const label = document.getElementById('mic-label');
+  const card = document.getElementById('status-card');
+
+  if (listening) {
+    if (btn) {
+      btn.classList.add('listening-pulse', 'bg-brand-700');
+      btn.classList.remove('bg-brand-600');
+    }
+    if (label) label.innerText = "Listening...";
+    if (card) card.classList.add('border-brand-500', 'ring-2', 'ring-brand-200');
+  } else {
+    if (btn) {
+      btn.classList.remove('listening-pulse', 'bg-brand-700');
+      btn.classList.add('bg-brand-600');
+    }
+    if (label) label.innerText = "Tap & Speak";
+    if (card) card.classList.remove('border-brand-500', 'ring-2', 'ring-brand-200');
+  }
+}
+
 
     function updateMicUI(listening) {
       const btn = document.getElementById('mic-button');
