@@ -100,6 +100,23 @@
       <p id="status-text" class="text-slate-500 text-sm font-medium">Try saying: <span class="italic font-semibold text-slate-700">"Urgent O-Negative needed near AIIMS"</span></p>
     </div>
 
+   <!-- Manual Text Search Bar -->
+<div class="w-full max-w-md mt-4 flex items-center gap-2">
+  <input
+    type="text"
+    id="manual-search-input"
+    placeholder="Type (e.g. O+ blood in AIIMS or Safdarjung)"
+    onkeydown="if(event.key === 'Enter') handleManualSearch()"
+    class="flex-1 px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm"
+  />
+  <button
+    onclick="handleManualSearch()"
+    class="px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl transition shadow-md shadow-brand-600/20 whitespace-nowrap"
+  >
+    Search
+  </button>
+</div>
+
     <!-- Quick Fallback Demo Trigger -->
     <div class="mt-6 flex items-center gap-2 text-xs text-slate-400">
       <span>Microphone not working?</span>
