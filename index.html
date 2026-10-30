@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BloodLink | Voice-First Emergency Blood Donor Network</title>
-  
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
+
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
+
   <script>
     tailwind.config = {
       theme: {
@@ -56,15 +56,15 @@
           <span class="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Supabase Connected</span>
         </div>
       </div>
-      
+
       <div class="flex items-center gap-3">
         <span id="user-status-badge" class="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-600">
           <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
           Ready
         </span>
-        <button 
-          id="nav-login-btn" 
-          onclick="openAuthModal()" 
+        <button
+          id="nav-login-btn"
+          onclick="openAuthModal()"
           class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer"
         >
           Login / Verify
@@ -89,9 +89,9 @@
 
     <!-- Voice SOS Button -->
     <div class="relative flex items-center justify-center mb-6">
-      <button 
-        id="mic-button" 
-        onclick="toggleVoiceSOS()" 
+      <button
+        id="mic-button"
+        onclick="toggleVoiceSOS()"
         aria-label="Start Voice SOS"
         class="relative z-10 w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-brand-600 hover:bg-brand-700 text-white flex flex-col items-center justify-center shadow-xl shadow-brand-600/30 transition-transform active:scale-95 cursor-pointer focus:outline-none"
       >
@@ -109,15 +109,15 @@
 
     <!-- Manual Search Box -->
     <div class="w-full max-w-md mt-4 flex items-center gap-2">
-      <input 
-        type="text" 
-        id="manual-search-input" 
-        placeholder="Type blood group & location (e.g. O+ AIIMS)" 
+      <input
+        type="text"
+        id="manual-search-input"
+        placeholder="Type blood group & location (e.g. O+ AIIMS)"
         onkeydown="if(event.key === 'Enter') handleManualSearch()"
         class="flex-1 px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm"
       />
-      <button 
-        onclick="handleManualSearch()" 
+      <button
+        onclick="handleManualSearch()"
         class="px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl transition shadow-md shadow-brand-600/20 whitespace-nowrap cursor-pointer"
       >
         Search
@@ -168,7 +168,7 @@
   <!-- Login & Verification Modal -->
   <div id="auth-modal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 relative">
-      
+
       <!-- Close Button -->
       <button onclick="closeAuthModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 cursor-pointer">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -197,11 +197,11 @@
           <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Mobile Number</label>
           <div class="relative">
             <span class="absolute left-3.5 top-3 text-sm font-semibold text-slate-400">+91</span>
-            <input 
-              type="tel" 
-              id="auth-phone-input" 
-              maxlength="10" 
-              placeholder="98765 43210" 
+            <input
+              type="tel"
+              id="auth-phone-input"
+              maxlength="10"
+              placeholder="98765 43210"
               class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
@@ -209,20 +209,20 @@
 
         <div id="phone-otp-group" class="hidden">
           <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">6-Digit Verification Code</label>
-          <input 
-            type="text" 
-            id="auth-phone-otp" 
-            maxlength="6" 
-            placeholder="• • • • • •" 
+          <input
+            type="text"
+            id="auth-phone-otp"
+            maxlength="6"
+            placeholder="• • • • • •"
             class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium tracking-widest text-center focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
           <p class="text-[11px] text-emerald-600 font-medium mt-1">OTP sent via SMS (Demo code: any 6 digits)</p>
         </div>
 
-        <button 
-          id="phone-submit-btn" 
-          type="button" 
-          onclick="handlePhoneAuthStep()" 
+        <button
+          id="phone-submit-btn"
+          type="button"
+          onclick="handlePhoneAuthStep()"
           class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl transition shadow-md shadow-brand-600/20 cursor-pointer"
         >
           Send OTP
@@ -233,11 +233,11 @@
       <div id="id-auth-panel" class="hidden space-y-4">
         <div>
           <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">National ID / Aadhaar Number</label>
-          <input 
-            type="password" 
-            id="auth-id-input" 
-            maxlength="12" 
-            placeholder="•••• •••• ••••" 
+          <input
+            type="password"
+            id="auth-id-input"
+            maxlength="12"
+            placeholder="•••• •••• ••••"
             class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium tracking-widest text-center focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
           <p class="text-[11px] text-slate-400 mt-1">Encrypted transmission to secure KYC gateway</p>
@@ -245,19 +245,19 @@
 
         <div id="id-otp-group" class="hidden">
           <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Gateway Linked Mobile OTP</label>
-          <input 
-            type="text" 
-            id="auth-id-otp" 
-            maxlength="6" 
-            placeholder="• • • • • •" 
+          <input
+            type="text"
+            id="auth-id-otp"
+            maxlength="6"
+            placeholder="• • • • • •"
             class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium tracking-widest text-center focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
 
-        <button 
-          id="id-submit-btn" 
-          type="button" 
-          onclick="handleIdAuthStep()" 
+        <button
+          id="id-submit-btn"
+          type="button"
+          onclick="handleIdAuthStep()"
           class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-xl transition cursor-pointer"
         >
           Verify via UIDAI Gateway OTP
@@ -395,7 +395,7 @@
     function initSpeech() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return null;
-      
+
       const recog = new SpeechRecognition();
       recog.continuous = false;
       recog.interimResults = true;
@@ -605,15 +605,15 @@
           </div>
 
           <div class="flex gap-2">
-            <a 
+            <a
               href="https://wa.me/${(donor.phone || '').replace(/[^0-9]/g, '')}?text=EMERGENCY:%20Urgent%20${encodeURIComponent(donor.blood_group)}%20blood%20needed%20near%20${encodeURIComponent(currentRequirement.location)}."
-              target="_blank" 
+              target="_blank"
               class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition text-center flex items-center justify-center"
             >
               WhatsApp
             </a>
-            <a 
-              href="tel:${donor.phone || ''}" 
+            <a
+              href="tel:${donor.phone || ''}"
               class="flex-1 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2.5 rounded-xl transition text-center flex items-center justify-center"
             >
               Call Direct
